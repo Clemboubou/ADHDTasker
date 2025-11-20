@@ -2,56 +2,75 @@
 
 ## CMake Build Error: "ninja: error: manifest 'build.ninja' still dirty after 100 tries"
 
-This error occurs when react-native-reanimated's CMake configuration enters an infinite loop regenerating build files on Windows. This is a known issue with CMake file globbing on Windows that triggers constant regeneration.
+This error occurs when react-native-reanimated's CMake configuration enters an infinite loop regenerating build files on Windows. This is a **known issue with CMake 3.22.1 file globbing on Windows** that affects react-native-reanimated.
 
-### Solution
+### AUTOMATED FIX (Recommended)
 
-The project has been configured with the following fixes:
-
-1. **android/gradle.properties** - Disabled CMake file API (`android.enableCmakeFileApi=false`)
-2. **android/build.gradle** - Added subprojects configuration to apply CMake arguments specifically to react-native-reanimated
-
-### QUICKEST FIX: Reinstall react-native-reanimated
-
-The most reliable solution is to completely reinstall react-native-reanimated:
+We've created a PowerShell script that automatically cleans all corrupted build caches:
 
 ```powershell
-# From your project root
-npm uninstall react-native-reanimated
-npm install react-native-reanimated@~3.10.1
+# From your project root (ADHDTasker directory)
+.\fix-reanimated-windows.ps1
+```
 
-# Clean and rebuild
-cd android
-.\gradlew clean
-cd ..
+This script will:
+1. Delete the corrupted `.cxx` cache
+2. Clean Gradle build cache
+3. Clean Android build directories
+4. Clean `.gradle` directory
+
+After running the script, try building again:
+```powershell
 npm run android
 ```
 
-### ALTERNATIVE: Clean CMake cache manually
+### MANUAL FIX
 
-If you prefer not to reinstall, you can manually clean the corrupted CMake cache:
+If you prefer to fix manually, follow these steps:
 
 #### On Windows:
 
-1. **Stop any running Metro bundler or build processes**
-
-2. **Delete CMake build cache:**
+1. **Delete CMake build cache (CRITICAL):**
    ```powershell
-   # Navigate to your project root
-   cd C:\path\to\ADHDTasker
-
-   # Delete CMake build cache - THIS IS CRITICAL
    Remove-Item -Recurse -Force node_modules\react-native-reanimated\android\.cxx -ErrorAction SilentlyContinue
    ```
 
-3. **Clean Gradle cache:**
+2. **Clean Gradle cache:**
    ```powershell
    cd android
    .\gradlew clean
    cd ..
    ```
 
+3. **Clean build directories:**
+   ```powershell
+   Remove-Item -Recurse -Force android\app\build -ErrorAction SilentlyContinue
+   Remove-Item -Recurse -Force android\.gradle -ErrorAction SilentlyContinue
+   ```
+
 4. **Rebuild:**
+   ```powershell
+   npm run android
+   ```
+
+### If the Issue Persists
+
+If you're still experiencing the issue after trying the above solutions:
+
+1. **Close Android Studio** if it's open (it may lock files)
+
+2. **Reinstall react-native-reanimated:**
+   ```powershell
+   npm uninstall react-native-reanimated
+   npm install react-native-reanimated@~3.10.1
+   ```
+
+3. **Run the fix script again:**
+   ```powershell
+   .\fix-reanimated-windows.ps1
+   ```
+
+4. **Try building:**
    ```powershell
    npm run android
    ```
