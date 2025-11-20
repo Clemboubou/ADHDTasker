@@ -1,4 +1,9 @@
 {
   "name": "ADHDTasker",
-  "displayName": "ADHDTasker"
+  "displayName": "ADHDTasker",
+  "extra": {
+    "eas": {
+      "projectId": "9e9b4499-d7cd-4b14-92ac-c2adc0bfdcae"
+    }
+  }
 }
