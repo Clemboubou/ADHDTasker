@@ -5,5 +5,11 @@
     "eas": {
       "projectId": "9e9b4499-d7cd-4b14-92ac-c2adc0bfdcae"
     }
-  }
+  },
+  "slug": "adhdtasker",
+  "version": "0.0.1",
+  "platforms": [
+    "ios",
+    "android"
+  ]
 }
