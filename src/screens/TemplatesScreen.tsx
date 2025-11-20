@@ -241,7 +241,7 @@ const TemplatesScreen: React.FC = () => {
       setLoading(true);
       const loadedTemplates = await Database.getAllTemplates();
       setTemplates(loadedTemplates);
-    } catch (error) {
+    } catch (_error) {
       console.error('Error loading templates:', error);
     } finally {
       setLoading(false);
@@ -260,7 +260,7 @@ const TemplatesScreen: React.FC = () => {
       }
       await loadTemplates();
       Alert.alert('Success', 'Default templates created!');
-    } catch (error) {
+    } catch (_error) {
       Alert.alert('Error', 'Failed to create default templates');
     }
   };
@@ -281,24 +281,29 @@ const TemplatesScreen: React.FC = () => {
                 const taskTemplate = template.tasks[i];
                 const newTaskId = uuidv4();
 
-                const newTask: Partial<Task> = {
-                  ...taskTemplate,
-                  id: newTaskId,
-                  createdAt: new Date(),
+                // Remove fields that createTask will generate
+                const { xpReward: _xpReward, pomodorosCompleted: _pomodorosCompleted, ...taskData } = taskTemplate;
+
+                // Prepare task data for creation
+                let newTaskData: Omit<Task, 'id' | 'createdAt' | 'xpReward' | 'pomodorosCompleted'> = {
+                  ...taskData,
                 };
 
                 // If template is chained, link tasks
-                if (template.isChained && previousTaskId) {
-                  newTask.chainId = template.id;
-                  newTask.chainOrder = i;
-                  newTask.nextTaskId = undefined; // Will be set for previous task
+                if (template.isChained) {
+                  newTaskData = {
+                    ...newTaskData,
+                    chainId: template.id,
+                    chainOrder: i,
+                  };
                 }
 
-                await createTask(newTask);
+                await createTask(newTaskData);
 
                 // Update previous task's nextTaskId
                 if (template.isChained && previousTaskId) {
                   // TODO: Update previous task with nextTaskId
+                  // This would require updating the task in the database
                 }
 
                 previousTaskId = newTaskId;
@@ -308,7 +313,7 @@ const TemplatesScreen: React.FC = () => {
                 'Success',
                 `Created ${template.tasks.length} tasks from template!`
               );
-            } catch (error) {
+            } catch (_error) {
               Alert.alert('Error', 'Failed to create tasks from template');
             }
           },
@@ -330,7 +335,7 @@ const TemplatesScreen: React.FC = () => {
             try {
               await Database.deleteTemplate(templateId);
               await loadTemplates();
-            } catch (error) {
+            } catch (_error) {
               Alert.alert('Error', 'Failed to delete template');
             }
           },

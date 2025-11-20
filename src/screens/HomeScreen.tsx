@@ -10,7 +10,6 @@ import {
   StyleSheet,
   ScrollView,
   RefreshControl,
-  TouchableOpacity,
 } from 'react-native';
 import { useTask } from '../contexts/TaskContext';
 import { useGamification } from '../contexts/GamificationContext';
@@ -18,23 +17,18 @@ import { TaskCard } from '../components/Task/TaskCard';
 import { LevelBadge } from '../components/Gamification/LevelBadge';
 import { StreakDisplay } from '../components/Gamification/StreakDisplay';
 import { XPBar } from '../components/Gamification/XPBar';
-import { Button } from '../components/Common/Button';
 import { COLORS, FONT_SIZES, SPACING, DEFAULTS } from '../utils/constants';
 import { Task } from '../types';
 import { getXPForCurrentLevel } from '../utils/xpCalculator';
 
 const HomeScreen: React.FC = () => {
-  const { tasks, completeTask, getTodayTasks, getUrgentTasks, refreshTasks, loading } = useTask();
+  const { completeTask, getTodayTasks, getUrgentTasks, refreshTasks } = useTask();
   const { stats, currentLevel, levelProgress, xpForNextLevel, xpUntilNextLevel, levelTitle, addXP } = useGamification();
 
   const [refreshing, setRefreshing] = useState(false);
   const [todayTasks, setTodayTasks] = useState<Task[]>([]);
 
-  useEffect(() => {
-    loadTodayTasks();
-  }, [tasks]);
-
-  const loadTodayTasks = () => {
+  const loadTodayTasks = React.useCallback(() => {
     // Get urgent tasks and today's tasks
     const urgent = getUrgentTasks();
     const today = getTodayTasks();
@@ -65,7 +59,11 @@ const HomeScreen: React.FC = () => {
 
     // Take only top 5
     setTodayTasks(sorted.slice(0, DEFAULTS.todayFocusMaxTasks));
-  };
+  }, [getTodayTasks, getUrgentTasks]);
+
+  useEffect(() => {
+    loadTodayTasks();
+  }, [loadTodayTasks]);
 
   const onRefresh = async () => {
     setRefreshing(true);

@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Switch, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Switch } from 'react-native';
 import { useSettings } from '../contexts/SettingsContext';
 import { useGamification } from '../contexts/GamificationContext';
 import { COLORS, FONT_SIZES, SPACING, BORDER_RADIUS } from '../utils/constants';

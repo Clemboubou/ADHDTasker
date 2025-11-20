@@ -19,7 +19,6 @@ import { useGamification } from '../contexts/GamificationContext';
 import { Task } from '../types';
 import { TaskForm } from '../components/Task/TaskForm';
 import { Button } from '../components/Common/Button';
-import { Modal } from '../components/Common/Modal';
 import {
   COLORS,
   FONT_SIZES,
@@ -57,7 +56,7 @@ const TaskDetailScreen: React.FC<TaskDetailScreenProps> = ({ route, navigation }
       await updateTask(updatedTask);
       setTask(updatedTask);
       setIsEditing(false);
-    } catch (error) {
+    } catch (_error) {
       Alert.alert('Error', 'Failed to update task');
     }
   };
@@ -75,7 +74,7 @@ const TaskDetailScreen: React.FC<TaskDetailScreenProps> = ({ route, navigation }
             try {
               await deleteTask(taskId);
               navigation.goBack();
-            } catch (error) {
+            } catch (_error) {
               Alert.alert('Error', 'Failed to delete task');
             }
           },
@@ -96,7 +95,7 @@ const TaskDetailScreen: React.FC<TaskDetailScreenProps> = ({ route, navigation }
       } else {
         Alert.alert('Task Completed!', `You earned ${xpGained} XP!`);
       }
-    } catch (error) {
+    } catch (_error) {
       Alert.alert('Error', 'Failed to complete task');
     }
   };
