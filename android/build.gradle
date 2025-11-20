@@ -19,3 +19,26 @@ buildscript {
 }
 
 apply plugin: "com.facebook.react.rootproject"
+
+// Fix for react-native-reanimated CMake rebuild loop on Windows
+subprojects { subproject ->
+    afterEvaluate {
+        if (subproject.name == 'react-native-reanimated') {
+            subproject.android {
+                if (subproject.android.hasProperty('externalNativeBuild') &&
+                    subproject.android.externalNativeBuild != null &&
+                    subproject.android.externalNativeBuild.hasProperty('cmake')) {
+
+                    subproject.android.defaultConfig.externalNativeBuild.cmake {
+                        // Disable compile commands export to prevent rebuild loops
+                        arguments "-DCMAKE_EXPORT_COMPILE_COMMANDS=OFF"
+                        // Disable verbose output
+                        arguments "-DCMAKE_VERBOSE_MAKEFILE=OFF"
+                        // Disable file API
+                        arguments "-DCMAKE_ENABLE_FILE_API=OFF"
+                    }
+                }
+            }
+        }
+    }
+}
