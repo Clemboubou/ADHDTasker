@@ -1,97 +1,327 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# ADHD Task Manager
 
-# Getting Started
+A powerful mobile task management application designed specifically for people with ADHD. Built with React Native and TypeScript for Android.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+## Features
 
-## Step 1: Start Metro
+### Core Task Management
+- Create, edit, and delete tasks with rich details
+- Time estimation for each task
+- Customizable categories and tags
+- Priority levels (high, medium, low) with visual indicators
+- Task status tracking (to-do, in progress, completed)
+- Photo attachments for tasks
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+### Pomodoro Timer
+- Integrated 25/5 Pomodoro timer (customizable)
+- Sound and visual notifications
+- Track Pomodoros per task
+- Long breaks after 4 Pomodoros
+- Background timer support
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+### Gamification System
+- XP/Level progression system
+- Points based on task difficulty and time
+- Daily streak tracking
+- Bonus rewards for urgent tasks and streaks
+- Level titles and achievements
 
-```sh
-# Using npm
+### Views
+- **Today Focus**: Streamlined view of 3-5 priority tasks
+- **Task List**: Full task list with advanced filters
+- **Calendar**: Monthly, weekly, and daily views
+- **History**: Complete task history with statistics
+- **Templates**: Reusable task routines
+
+### Smart Features
+- Task chains (auto-progression through sequences)
+- Recurring tasks
+- Smart notifications
+- Export/Import data (JSON backup)
+- Comprehensive statistics and analytics
+
+## Tech Stack
+
+- **Framework**: React Native 0.82
+- **Language**: TypeScript
+- **Navigation**: React Navigation
+- **Database**: SQLite (react-native-sqlite-storage)
+- **Storage**: AsyncStorage
+- **UI Libraries**:
+  - react-native-calendars
+  - react-native-chart-kit
+  - react-native-vector-icons
+  - react-native-reanimated
+- **Utilities**: date-fns, uuid
+
+## Installation
+
+### Prerequisites
+- Node.js >= 20
+- Android SDK
+- React Native development environment setup
+
+### Steps
+
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/ADHDTasker.git
+cd ADHDTasker
+```
+
+2. Install dependencies:
+```bash
+npm install
+# or
+yarn install
+```
+
+3. For Android, install additional dependencies:
+```bash
+cd android
+./gradlew clean
+cd ..
+```
+
+4. Link native dependencies (if needed):
+```bash
+npx react-native link react-native-vector-icons
+npx react-native link react-native-sqlite-storage
+```
+
+## Running the App
+
+### Development Mode
+
+```bash
+# Start Metro bundler
 npm start
 
-# OR using Yarn
-yarn start
-```
-
-## Step 2: Build and run your app
-
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
-
-### Android
-
-```sh
-# Using npm
+# Run on Android
 npm run android
-
-# OR using Yarn
-yarn android
 ```
 
-### iOS
+### Building APK
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
+#### Debug APK
+```bash
+cd android
+./gradlew assembleDebug
 ```
 
-Then, and every time you update your native dependencies, run:
+The APK will be located at:
+`android/app/build/outputs/apk/debug/app-debug.apk`
 
-```sh
-bundle exec pod install
+#### Release APK
+
+1. Generate a signing key (first time only):
+```bash
+keytool -genkeypair -v -storetype PKCS12 -keystore adhd-tasker-release.keystore -alias adhd-tasker -keyalg RSA -keysize 2048 -validity 10000
 ```
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+2. Place the keystore file in `android/app/`
 
-```sh
-# Using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
+3. Create `android/gradle.properties` with:
+```properties
+MYAPP_RELEASE_STORE_FILE=adhd-tasker-release.keystore
+MYAPP_RELEASE_KEY_ALIAS=adhd-tasker
+MYAPP_RELEASE_STORE_PASSWORD=your_store_password
+MYAPP_RELEASE_KEY_PASSWORD=your_key_password
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+4. Update `android/app/build.gradle` with signing config:
+```gradle
+android {
+    ...
+    signingConfigs {
+        release {
+            if (project.hasProperty('MYAPP_RELEASE_STORE_FILE')) {
+                storeFile file(MYAPP_RELEASE_STORE_FILE)
+                storePassword MYAPP_RELEASE_STORE_PASSWORD
+                keyAlias MYAPP_RELEASE_KEY_ALIAS
+                keyPassword MYAPP_RELEASE_KEY_PASSWORD
+            }
+        }
+    }
+    buildTypes {
+        release {
+            ...
+            signingConfig signingConfigs.release
+        }
+    }
+}
+```
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+5. Build release APK:
+```bash
+cd android
+./gradlew assembleRelease
+```
 
-## Step 3: Modify your app
+The signed APK will be at:
+`android/app/build/outputs/apk/release/app-release.apk`
 
-Now that you have successfully run the app, let's make changes!
+## Project Structure
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+```
+ADHDTasker/
+├── src/
+│   ├── components/       # Reusable UI components
+│   │   ├── Task/
+│   │   ├── Pomodoro/
+│   │   ├── Gamification/
+│   │   ├── Templates/
+│   │   └── Common/
+│   ├── screens/          # Main app screens
+│   ├── navigation/       # Navigation configuration
+│   ├── contexts/         # React Context providers
+│   ├── services/         # Database, storage, notifications
+│   ├── utils/            # Utility functions and constants
+│   └── types/            # TypeScript type definitions
+├── android/              # Android native code
+├── ios/                  # iOS native code (future)
+└── App.tsx               # Root component
+```
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+## Usage Guide
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+### Creating a Task
+1. Tap the "+" button
+2. Enter task details (title, description, time estimate)
+3. Select category and priority
+4. Optionally add photos
+5. Save
 
-## Congratulations! :tada:
+### Using Pomodoro Timer
+1. Open a task
+2. Tap "Start Pomodoro"
+3. Focus for 25 minutes
+4. Take a 5-minute break
+5. Repeat
 
-You've successfully run and modified your React Native App. :partying_face:
+### Today Focus
+- Automatically selects 3-5 priority tasks
+- Based on urgency, priority, and recurring patterns
+- Customize manually if needed
 
-### Now what?
+### Creating Templates
+1. Go to Templates screen
+2. Create new template
+3. Add tasks to the template
+4. Save for future use
+5. Instantiate template to create all tasks at once
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+### Viewing Statistics
+- Go to Stats screen
+- View completion rates, XP earned, time spent
+- Filter by date range or category
+- Export data as JSON
 
-# Troubleshooting
+## Configuration
 
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+### Pomodoro Settings
+Navigate to Settings to customize:
+- Focus duration (default: 25 min)
+- Short break (default: 5 min)
+- Long break (default: 15 min)
+- Pomodoros until long break (default: 4)
 
-# Learn More
+### Notifications
+- Enable/disable notifications
+- Set daily motivation time
+- Configure streak reminders
+- Sound settings
 
-To learn more about React Native, take a look at the following resources:
+### XP System
+- Base XP: 10 per task
+- Time bonus: 2 XP per minute estimated
+- Priority multipliers: Low (1x), Medium (1.5x), High (2x)
+- Urgent task bonus: +50 XP
+- Streak bonus: +10% per day
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+## Data Management
+
+### Backup
+- Tap "Export Data" in Settings
+- Saves all tasks, templates, and stats as JSON
+- Store backup file safely
+
+### Restore
+- Tap "Import Data" in Settings
+- Select backup JSON file
+- All data will be restored
+
+### Reset
+- Clear all data from Settings
+- Warning: This cannot be undone!
+
+## Troubleshooting
+
+### App won't start
+```bash
+# Clear cache
+cd android
+./gradlew clean
+cd ..
+npm start -- --reset-cache
+```
+
+### Database issues
+- Clear app data from Android settings
+- Reinstall the app
+
+### Notification not working
+- Check Android notification permissions
+- Ensure battery optimization is disabled for the app
+
+## Development Status
+
+### Completed
+- [x] Project setup with TypeScript
+- [x] Database structure (SQLite)
+- [x] Storage utilities (AsyncStorage)
+- [x] Type definitions
+- [x] Constants and utilities
+- [x] XP calculation system
+- [x] Date helpers
+
+### In Progress
+- [ ] Task Context and CRUD operations
+- [ ] UI Components
+- [ ] Navigation setup
+- [ ] Screen implementations
+
+### Planned
+- [ ] Pomodoro timer
+- [ ] Notifications
+- [ ] Gamification UI
+- [ ] Calendar view
+- [ ] Templates
+- [ ] Export/Import
+- [ ] Statistics and charts
+
+## Contributing
+
+This is a personal project, but suggestions and bug reports are welcome!
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Open a Pull Request
+
+## License
+
+MIT License - See LICENSE file for details
+
+## Acknowledgments
+
+Built with React Native and love for productivity.
+
+## Contact
+
+For questions or feedback, open an issue on GitHub.
+
+---
+
+**Note**: This app is designed for personal use and optimized for Android devices, specifically tested on Vivo X80 Pro.
