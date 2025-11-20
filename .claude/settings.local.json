@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push)",
+      "Bash(git pull:*)",
+      "Bash(git stash:*)",
+      "Bash(git rebase:*)",
+      "Bash(./gradlew assembleRelease:*)",
+      "WebSearch",
+      "Bash(./gradlew clean:*)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(dir:*)",
+      "Bash(powershell -Command \"Get-Content build.gradle | Select-Object -Last 10\")",
+      "Bash(test:*)",
+      "Bash(echo $env:ANDROID_HOME)",
+      "Bash(powershell:*)",
+      "Bash(npx tsc:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
