@@ -242,7 +242,7 @@ const TemplatesScreen: React.FC = () => {
       const loadedTemplates = await Database.getAllTemplates();
       setTemplates(loadedTemplates);
     } catch (_error) {
-      console.error('Error loading templates:', error);
+      console.error('Error loading templates:', _error);
     } finally {
       setLoading(false);
     }
