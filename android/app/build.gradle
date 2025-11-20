@@ -84,6 +84,15 @@ android {
         manifestPlaceholders = [
             usesCleartextTraffic: "true"
         ]
+
+        // CMake configuration to prevent rebuild loops with react-native-reanimated
+        externalNativeBuild {
+            cmake {
+                arguments "-DCMAKE_EXPORT_COMPILE_COMMANDS=OFF",
+                          "-DCMAKE_VERBOSE_MAKEFILE=OFF"
+                cppFlags ""
+            }
+        }
     }
     signingConfigs {
         debug {
