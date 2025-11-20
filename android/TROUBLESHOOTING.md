@@ -2,43 +2,57 @@
 
 ## CMake Build Error: "ninja: error: manifest 'build.ninja' still dirty after 100 tries"
 
-This error occurs when react-native-reanimated's CMake configuration enters an infinite loop regenerating build files on Windows.
+This error occurs when react-native-reanimated's CMake configuration enters an infinite loop regenerating build files on Windows. This is a known issue with CMake file globbing on Windows that triggers constant regeneration.
 
 ### Solution
 
 The project has been configured with the following fixes:
 
-1. **gradle.properties** - Added CMake arguments to disable compile commands export
-2. **app/build.gradle** - Added CMake configuration in defaultConfig to prevent rebuild loops
+1. **android/gradle.properties** - Disabled CMake file API (`android.enableCmakeFileApi=false`)
+2. **android/build.gradle** - Added subprojects configuration to apply CMake arguments specifically to react-native-reanimated
 
-### If the error persists, follow these steps:
+### QUICKEST FIX: Reinstall react-native-reanimated
+
+The most reliable solution is to completely reinstall react-native-reanimated:
+
+```powershell
+# From your project root
+npm uninstall react-native-reanimated
+npm install react-native-reanimated@~3.10.1
+
+# Clean and rebuild
+cd android
+.\gradlew clean
+cd ..
+npm run android
+```
+
+### ALTERNATIVE: Clean CMake cache manually
+
+If you prefer not to reinstall, you can manually clean the corrupted CMake cache:
 
 #### On Windows:
 
-1. **Clean CMake cache:**
+1. **Stop any running Metro bundler or build processes**
+
+2. **Delete CMake build cache:**
    ```powershell
    # Navigate to your project root
    cd C:\path\to\ADHDTasker
 
-   # Delete CMake build cache
-   Remove-Item -Recurse -Force node_modules\react-native-reanimated\android\.cxx
+   # Delete CMake build cache - THIS IS CRITICAL
+   Remove-Item -Recurse -Force node_modules\react-native-reanimated\android\.cxx -ErrorAction SilentlyContinue
    ```
 
-2. **Clean Gradle cache:**
+3. **Clean Gradle cache:**
    ```powershell
    cd android
    .\gradlew clean
-   ```
-
-3. **Clear Gradle build cache (optional):**
-   ```powershell
-   # This clears the global Gradle cache
-   Remove-Item -Recurse -Force $env:USERPROFILE\.gradle\caches
+   cd ..
    ```
 
 4. **Rebuild:**
    ```powershell
-   cd ..
    npm run android
    ```
 
