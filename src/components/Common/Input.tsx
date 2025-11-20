@@ -36,8 +36,8 @@ export const Input: React.FC<InputProps> = ({
       <TextInput
         style={[
           styles.input,
-          multiline && styles.multilineInput,
-          error && styles.inputError,
+          multiline ? styles.multilineInput : undefined,
+          error ? styles.inputError : undefined,
         ]}
         placeholderTextColor={COLORS.textMuted}
         multiline={multiline}
