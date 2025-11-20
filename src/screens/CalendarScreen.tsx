@@ -9,7 +9,7 @@ import { Calendar, DateData } from 'react-native-calendars';
 import { useTask } from '../contexts/TaskContext';
 import { TaskCard } from '../components/Task/TaskCard';
 import { Task } from '../types';
-import { COLORS, FONT_SIZES, SPACING, BORDER_RADIUS } from '../utils/constants';
+import { COLORS, FONT_SIZES, SPACING } from '../utils/constants';
 import { isSameDay } from '../utils/dateHelpers';
 
 const CalendarScreen: React.FC = () => {
@@ -19,18 +19,18 @@ const CalendarScreen: React.FC = () => {
   );
   const [tasksForDate, setTasksForDate] = useState<Task[]>([]);
 
-  useEffect(() => {
-    loadTasksForDate(selectedDate);
-  }, [selectedDate, tasks]);
-
-  const loadTasksForDate = (dateString: string) => {
+  const loadTasksForDate = React.useCallback((dateString: string) => {
     const selectedDateObj = new Date(dateString);
     const filtered = tasks.filter(task => {
       const taskDate = task.deadline || task.createdAt;
       return isSameDay(taskDate, selectedDateObj);
     });
     setTasksForDate(filtered);
-  };
+  }, [tasks]);
+
+  useEffect(() => {
+    loadTasksForDate(selectedDate);
+  }, [selectedDate, loadTasksForDate]);
 
   const handleCompleteTask = async (taskId: string) => {
     try {

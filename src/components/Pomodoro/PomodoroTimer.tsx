@@ -25,7 +25,7 @@ interface PomodoroTimerProps {
 }
 
 export const PomodoroTimer: React.FC<PomodoroTimerProps> = ({
-  taskId,
+  taskId: _taskId,
   onSessionComplete,
   onPomodoroComplete,
 }) => {

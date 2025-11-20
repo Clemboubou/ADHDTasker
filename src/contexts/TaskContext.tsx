@@ -5,7 +5,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { Task, TaskFilters, Priority, TaskStatus } from '../types';
+import { Task, TaskFilters, TaskStatus } from '../types';
 import * as Database from '../services/database';
 import { calculateTaskXP } from '../utils/xpCalculator';
 import { isDeadlineUrgent } from '../utils/dateHelpers';

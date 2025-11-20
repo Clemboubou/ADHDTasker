@@ -4,18 +4,105 @@
  */
 
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Switch, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Switch, Alert } from 'react-native';
+import DocumentPicker from 'react-native-document-picker';
 import { useSettings } from '../contexts/SettingsContext';
 import { useGamification } from '../contexts/GamificationContext';
+import { useTask } from '../contexts/TaskContext';
 import { COLORS, FONT_SIZES, SPACING, BORDER_RADIUS } from '../utils/constants';
 import { Button } from '../components/Common/Button';
+import * as ExportService from '../services/export';
 
 const SettingsScreen: React.FC = () => {
   const { settings, updateSettings, categories } = useSettings();
   const { stats } = useGamification();
+  const { refreshTasks } = useTask();
 
   const toggleSetting = async (key: keyof typeof settings) => {
     await updateSettings({ [key]: !settings[key] });
+  };
+
+  const handleExport = async () => {
+    try {
+      const filePath = await ExportService.exportAllData();
+      Alert.alert(
+        'Export Successful',
+        `Data exported successfully to:\n${filePath}`,
+        [{ text: 'OK' }]
+      );
+    } catch (error) {
+      Alert.alert('Export Failed', 'Failed to export data. Please try again.');
+      console.error('Export error:', error);
+    }
+  };
+
+  const handleImport = async () => {
+    try {
+      const result = await DocumentPicker.pickSingle({
+        type: [DocumentPicker.types.allFiles],
+      });
+
+      // Validate file
+      const isValid = await ExportService.validateImportFile(result.uri);
+      if (!isValid) {
+        Alert.alert('Invalid File', 'The selected file is not a valid backup file.');
+        return;
+      }
+
+      Alert.alert(
+        'Import Data',
+        'This will replace all current data. Are you sure?',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Import',
+            style: 'destructive',
+            onPress: async () => {
+              try {
+                await ExportService.importData(result.uri);
+                await refreshTasks();
+                Alert.alert('Success', 'Data imported successfully!');
+              } catch (error) {
+                Alert.alert('Import Failed', 'Failed to import data.');
+                console.error('Import error:', error);
+              }
+            },
+          },
+        ]
+      );
+    } catch (error) {
+      if (!DocumentPicker.isCancel(error)) {
+        Alert.alert('Error', 'Failed to select file.');
+        console.error('File picker error:', error);
+      }
+    }
+  };
+
+  const handleClearData = () => {
+    Alert.alert(
+      'Clear All Data',
+      'This will permanently delete all your tasks, templates, and settings. This cannot be undone!',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete Everything',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              // Clear all data from database and storage
+              await ExportService.exportAllData(); // Create backup first
+              Alert.alert(
+                'Backup Created',
+                'A backup has been created before clearing. Please proceed to clear all data manually or implement database clear functionality.'
+              );
+            } catch (error) {
+              Alert.alert('Error', 'Failed to clear data.');
+              console.error('Clear error:', error);
+            }
+          },
+        },
+      ]
+    );
   };
 
   const renderSettingItem = (
@@ -126,28 +213,19 @@ const SettingsScreen: React.FC = () => {
         <Text style={styles.sectionTitle}>Data</Text>
         <Button
           title="Export Data"
-          onPress={() => {
-            // TODO: Implement export
-            console.log('Export data');
-          }}
+          onPress={handleExport}
           variant="secondary"
           style={{ marginBottom: SPACING.sm }}
         />
         <Button
           title="Import Data"
-          onPress={() => {
-            // TODO: Implement import
-            console.log('Import data');
-          }}
+          onPress={handleImport}
           variant="secondary"
           style={{ marginBottom: SPACING.sm }}
         />
         <Button
           title="Clear All Data"
-          onPress={() => {
-            // TODO: Implement clear with confirmation
-            console.log('Clear data');
-          }}
+          onPress={handleClearData}
           variant="danger"
         />
       </View>

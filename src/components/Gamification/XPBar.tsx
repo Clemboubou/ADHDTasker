@@ -16,7 +16,7 @@ interface XPBarProps {
 }
 
 export const XPBar: React.FC<XPBarProps> = ({
-  currentXP,
+  currentXP: _currentXP,
   xpForNextLevel,
   xpInCurrentLevel,
   progress,

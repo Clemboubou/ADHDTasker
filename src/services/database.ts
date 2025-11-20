@@ -4,7 +4,7 @@
  */
 
 import SQLite from 'react-native-sqlite-storage';
-import { Task, Template, PomodoroSession, TaskChain, Category } from '../types';
+import { Task, Template, PomodoroSession, Category } from '../types';
 import { DATABASE } from '../utils/constants';
 
 // Enable debugging

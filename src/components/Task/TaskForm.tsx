@@ -10,14 +10,13 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Platform,
 } from 'react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { Task, Priority, TaskStatus, RecurringPattern } from '../../types';
 import { Input } from '../Common/Input';
 import { Button } from '../Common/Button';
 import { useSettings } from '../../contexts/SettingsContext';
-import { COLORS, FONT_SIZES, SPACING, BORDER_RADIUS, DEFAULTS } from '../../utils/constants';
+import { COLORS, FONT_SIZES, SPACING, BORDER_RADIUS } from '../../utils/constants';
 
 interface TaskFormProps {
   task?: Task;
@@ -35,7 +34,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ task, onSubmit, onCancel }) 
   const [priority, setPriority] = useState<Priority>(task?.priority || 'medium');
   const [status, setStatus] = useState<TaskStatus>(task?.status || 'todo');
   const [photos, setPhotos] = useState<string[]>(task?.photos || []);
-  const [deadline, setDeadline] = useState<Date | undefined>(task?.deadline);
+  const [deadline, _setDeadline] = useState<Date | undefined>(task?.deadline);
   const [isRecurring, setIsRecurring] = useState(task?.isRecurring || false);
   const [recurringPattern, setRecurringPattern] = useState<RecurringPattern>(
     task?.recurringPattern || 'none'
@@ -50,7 +49,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ task, onSubmit, onCancel }) 
       newErrors.title = 'Title is required';
     }
 
-    const timeNum = parseInt(estimatedTime);
+    const timeNum = parseInt(estimatedTime, 10);
     if (isNaN(timeNum) || timeNum <= 0) {
       newErrors.estimatedTime = 'Please enter a valid time';
     }
@@ -65,7 +64,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ task, onSubmit, onCancel }) 
     const taskData: Partial<Task> = {
       title: title.trim(),
       description: description.trim() || undefined,
-      estimatedTime: parseInt(estimatedTime),
+      estimatedTime: parseInt(estimatedTime, 10),
       category,
       priority,
       status,

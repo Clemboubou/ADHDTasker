@@ -17,7 +17,7 @@ import { useGamification } from '../contexts/GamificationContext';
 import { TaskCard } from '../components/Task/TaskCard';
 import { Button } from '../components/Common/Button';
 import { COLORS, FONT_SIZES, SPACING, FILTER_PRESETS } from '../utils/constants';
-import { Task, TaskStatus, Priority } from '../types';
+import { Task } from '../types';
 
 const TaskListScreen: React.FC = () => {
   const { tasks, completeTask, refreshTasks, filterTasks } = useTask();
@@ -27,11 +27,7 @@ const TaskListScreen: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState<string>(FILTER_PRESETS.ALL);
   const [filteredTasks, setFilteredTasks] = useState<Task[]>(tasks);
 
-  React.useEffect(() => {
-    applyFilter(activeFilter);
-  }, [tasks, activeFilter]);
-
-  const applyFilter = (filterType: string) => {
+  const applyFilter = React.useCallback((filterType: string) => {
     let filtered: Task[] = [];
 
     switch (filterType) {
@@ -63,7 +59,11 @@ const TaskListScreen: React.FC = () => {
     }
 
     setFilteredTasks(filtered);
-  };
+  }, [tasks, filterTasks]);
+
+  React.useEffect(() => {
+    applyFilter(activeFilter);
+  }, [activeFilter, applyFilter]);
 
   const onRefresh = async () => {
     setRefreshing(true);

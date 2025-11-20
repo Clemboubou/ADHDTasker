@@ -5,7 +5,7 @@
 
 import { Platform, PermissionsAndroid } from 'react-native';
 import RNFS from 'react-native-fs';
-import { ExportData, Task, Template, AppSettings, UserStats, Category } from '../types';
+import { ExportData } from '../types';
 import * as Database from './database';
 import * as Storage from './storage';
 import { EXPORT } from '../utils/constants';
@@ -100,16 +100,16 @@ export const importData = async (filePath: string): Promise<void> => {
   try {
     // Read file
     const jsonData = await RNFS.readFile(filePath, 'utf8');
-    const importData: ExportData = JSON.parse(jsonData);
+    const data: ExportData = JSON.parse(jsonData);
 
     // Validate version
-    if (!importData.version) {
+    if (!data.version) {
       throw new Error('Invalid backup file: missing version');
     }
 
     // Import tasks
-    if (importData.tasks && Array.isArray(importData.tasks)) {
-      for (const task of importData.tasks) {
+    if (data.tasks && Array.isArray(data.tasks)) {
+      for (const task of data.tasks) {
         // Convert date strings back to Date objects
         task.createdAt = new Date(task.createdAt);
         if (task.completedAt) task.completedAt = new Date(task.completedAt);
@@ -120,27 +120,27 @@ export const importData = async (filePath: string): Promise<void> => {
     }
 
     // Import templates
-    if (importData.templates && Array.isArray(importData.templates)) {
-      for (const template of importData.templates) {
+    if (data.templates && Array.isArray(data.templates)) {
+      for (const template of data.templates) {
         template.createdAt = new Date(template.createdAt);
         await Database.insertTemplate(template);
       }
     }
 
     // Import settings
-    if (importData.settings) {
-      await Storage.saveSettings(importData.settings);
+    if (data.settings) {
+      await Storage.saveSettings(data.settings);
     }
 
     // Import stats
-    if (importData.stats) {
-      importData.stats.lastActivityDate = new Date(importData.stats.lastActivityDate);
-      await Storage.saveUserStats(importData.stats);
+    if (data.stats) {
+      data.stats.lastActivityDate = new Date(data.stats.lastActivityDate);
+      await Storage.saveUserStats(data.stats);
     }
 
     // Import categories
-    if (importData.categories && Array.isArray(importData.categories)) {
-      await Storage.saveCategories(importData.categories);
+    if (data.categories && Array.isArray(data.categories)) {
+      await Storage.saveCategories(data.categories);
     }
 
     console.log('Data imported successfully');
@@ -246,7 +246,7 @@ export const validateImportFile = async (filePath: string): Promise<boolean> => 
     }
 
     return true;
-  } catch (error) {
+  } catch (_error) {
     return false;
   }
 };
