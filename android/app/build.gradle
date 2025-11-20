@@ -107,6 +107,12 @@ android {
     }
 }
 
+// Exclude old support libraries to avoid conflicts with AndroidX
+configurations.all {
+    exclude group: 'com.android.support', module: 'support-compat'
+    exclude group: 'com.android.support', module: 'support-core-utils'
+}
+
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
@@ -115,12 +121,6 @@ dependencies {
         implementation("com.facebook.react:hermes-android")
     } else {
         implementation jscFlavor
-    }
-
-    // Exclude old support libraries to avoid conflicts with AndroidX
-    configurations.all {
-        exclude group: 'com.android.support', module: 'support-compat'
-        exclude group: 'com.android.support', module: 'support-core-utils'
     }
 }
 
